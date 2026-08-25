@@ -17,15 +17,19 @@ The deliberate choice to use no framework is itself the point: the goal was to p
 - **Live product catalog** — rendered from the API, never hardcoded
 - **Responsive product grid** — multi-column on desktop, single column on mobile (CSS Grid + media queries)
 - **Product cards** — name, category, formatted price, and stock status badge
-- **Stock awareness** — out-of-stock products are visually distinct
+- **Stock awareness** — out-of-stock products are visually distinct and can't be added to the cart
 - **Graceful failure** — a friendly message when the API is unreachable, never a dead page
+- **Login page** — JWT stored in `localStorage`, header link flips between Login and Logout
+- **Add to cart** — from product cards, one click = one unit (repeat clicks merge into quantity server-side)
+- **Cart page** — per-item rows with subtotals and a server-computed total; read-only until the backend's cart PUT/DELETE endpoints land
 
 ### In Progress / Planned
 
-- [ ] Client-side search (wired to the API's `?search=` parameter)
+- [x] Client-side search (wired to the API's `?search=` parameter)
 - [ ] Category filtering
-- [ ] Login page (JWT stored in localStorage)
-- [ ] Shopping cart page
+- [x] Login page (JWT stored in localStorage)
+- [x] Shopping cart page
+- [ ] Cart quantity edit / item removal (blocked on backend `PUT`/`DELETE /api/v1/cart/items/{productId}`)
 
 ## Tech
 
@@ -42,10 +46,15 @@ The deliberate choice to use no framework is itself the point: the goal was to p
 ```
 shop-frontend/
 ├── index.html        # Storefront page (skeleton; grid is rendered by JS)
+├── login.html        # Login page — JWT stored in localStorage
+├── cart.html         # Cart page — read-only until cart PUT/DELETE land
 ├── css/
 │   └── style.css     # Palette variables, layout, cards, badges, responsive rules
 └── js/
-    └── app.js        # Fetch + render logic, error handling
+    ├── auth.js       # Shared helpers: auth state, header link, cart API calls
+    ├── app.js        # Storefront: fetch + render logic, search, add-to-cart
+    ├── login.js      # Login form handling
+    └── cart.js       # Cart fetch + render
 ```
 
 ## Getting Started
@@ -77,5 +86,7 @@ shop-frontend/
 | Endpoint | Used for |
 |----------|----------|
 | `GET /api/v1/products` | Product grid (paginated response — reads the `content` array) |
-| `GET /api/v1/products?search=` | Search *(planned)* |
-| `POST /api/v1/auth/login` | Login page *(planned)* |
+| `GET /api/v1/products?search=` | Search |
+| `POST /api/v1/auth/login` | Login page |
+| `POST /api/v1/cart/items` | Add to cart from product cards |
+| `GET /api/v1/cart` | Cart page |
